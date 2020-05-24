@@ -1,0 +1,131 @@
+data segment
+vettore  DB 0,0,0,0 
+lunghezzavet DB 4 
+somma DB 0
+str1 DB "Inserisci un numero da una cifra $" 
+str2 DB "La somma: $"
+divisore    DB 10 
+ends
+
+stack segment
+    dw   128  dup(0)
+ends
+
+code segment
+start:
+
+    ; add your code here
+    
+    MOV AX, data
+    MOV DS, AX
+    
+    MOV AL, 0
+    MOV SI, 0
+
+    MOV CX,0
+    MOV CL,lunghezzavet
+    
+ciclo: 
+
+chiedicifra:
+    CALL ACapo 
+    LEA DX, str1  ;visualizza la frase in str1
+    MOV AH, 09h
+    INT 21h
+    
+    MOV AH, 01h   ;richiede l'input di un carattere 
+    INT 21h  
+    
+    CMP AL, 30h     ;confrontrolla se il carratere e una cifra
+    JL  chiedicifra
+    CMP AL, 39h     
+    JG  chiedicifra
+    
+     
+                  
+    SUB AL, 30h   ;trasformazione da carattere a cifra
+    MOV vettore[SI], AL  ;la cifra viene memorizzata 
+    
+    INC SI 
+    
+    ADD BH, AL
+      
+
+    LOOP ciclo    
+   
+    
+    MOV somma,BH
+    CALL ACapo
+    LEA DX, str2  
+    MOV AH, 09h
+    INT 21h 
+    
+    
+    
+    
+    
+    MOV CX, 0      ;inizializzazione ciclo
+    MOV CL, 2
+     
+ciclostampa:                 ;Ciclo per la stampa
+     
+     Call DIVISIONE       
+      
+     MOV AH, 0            
+     MOV AL,divisore
+     MOV BL,10
+     DIV BL
+     MOV divisore, AL  
+     
+     LOOP ciclostampa
+         
+  
+    
+
+mov ax, 4c00h
+int 21h
+
+ACapo    PROC NEAR
+    PUSH AX
+    PUSH DX  
+    
+    
+    MOV DL, 0Ah     ;line feed
+    MOV AH, 02h
+    INT 21h
+    MOV DL, 0Dh     ;carriage return
+    MOV AH, 02h
+    INT 21h
+    POP DX
+    POP AX
+     
+    RET
+endp 
+
+divisione   PROC NEAR      
+    PUSH AX
+    PUSH BX
+    PUSH DX
+    
+    MOV AH, 0            
+    MOV AL, somma
+    MOV BL,divisore
+    DIV BL            
+     
+    MOV somma,AH      ;sostituzione del numero con il resto della divisione
+    
+    ADD AL, 30H        ;trasformazione del numero in carattere
+    
+    MOV DL, AL        
+    MOV AH, 02h
+    INT 21h
+    
+    POP DX
+    POP BX
+    POP AX
+    RET    
+endp
+
+ends
+
+end start
