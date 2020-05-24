@@ -1,0 +1,128 @@
+data segment  
+
+
+msg3 DB "La differenza e positiva! $"
+msg4 DB "La differenza non e positiva! $"
+msg5 DB "La differenza e zero: $"
+
+divisore DW 100
+numero DW ?
+
+vetUNO      DW 6, 4, 5, 2, 1  
+vetDUE      DW 7, 4, 5, 2, 1, 0
+dimUNO      DB 5
+dimDUE      DB 6
+
+sommaUNO    DW 0
+sommaDUE    DW 0
+                
+differenza  DW 0
+
+
+ends
+
+stack segment
+    dw   128  dup(0)
+ends
+
+code segment
+    ; add your code here
+  MOV AX, data
+  MOV ds, AX
+
+;CICLO1
+              
+    MOV AX, 0
+    MOV SI, 0
+
+    MOV CX,0
+    MOV CL,dimUNO
+    
+cicloUNO:
+    ADD AX,vetUNO[SI]  
+    ADD SI,2
+   
+    LOOP cicloUNO    
+   
+    MOV sommaUNO,AX
+        
+;CICLO2
+              
+    MOV AX, 0
+    MOV SI, 0
+
+    MOV CX,0
+    MOV CL,dimDUE
+    
+cicloDUE:
+    ADD AX,vetDUE[SI]  
+    ADD SI,2
+
+    LOOP cicloDUE    
+   
+    MOV sommaDUE,AX  
+    
+
+     
+    
+    
+;Differenza
+
+    MOV AX, 0
+    MOV BX, 0
+
+    MOV AX, sommaUNO
+    MOV BX, sommaDUE
+    SUB AX, BX
+    MOV differenza,AX
+    
+    
+    
+;IF
+    CMP AX,0
+    JG POS
+    JL NEGA
+    JE ZERO           
+POS:
+    LEA DX, msg3  
+    MOV AH, 09h
+    INT 21h 
+    CALL ACapo 
+    JMP fine
+NEGA:
+    LEA DX, msg4  
+    MOV AH, 09h
+    INT 21h 
+    CALL ACapo
+    JMP fine: 
+ZERO:
+    LEA DX, msg5  
+    MOV AH, 09h
+    INT 21h 
+    CALL ACapo 
+fine:            
+              
+  MOV AX, 4c00h
+  INT 21h 
+  
+  ACapo    PROC NEAR
+    PUSH AX
+    PUSH DX  
+    
+    
+    MOV DL, 0Ah     ;line feed
+    MOV AH, 02h
+    INT 21h
+    MOV DL, 0Dh     ;carriage return
+    MOV AH, 02h
+    INT 21h
+    POP DX
+    POP AX
+     
+    RET 
+    
+  endp 
+  
+
+
+ends
