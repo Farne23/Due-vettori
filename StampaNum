@@ -1,0 +1,88 @@
+data segment
+str1 DB "Il numero memorizzato e': $"
+numero      DB 234
+num3        DB 3
+num10       DB 0Ah
+
+unita       DB ?
+decine      DB ?   
+centinaia   DB ? 
+divisore    DB 100  
+
+num2 DB 2
+resto DB ? 
+
+
+ends
+
+stack segment
+    DW   128  dup(0)
+top DW ?
+ends
+
+code segment
+start:
+   
+    MOV AX, data
+    MOV DS, AX
+                
+    MOV AX, stack
+    MOV SS, AX 
+    LEA SP, top
+    
+        
+    LEA DX, str1 ;visualizzazione stringa
+    MOV AH, 09h
+    INT 21h
+    
+    MOV CX, 0      ;inizializzazione ciclo
+    MOV CL, num3
+     
+ciclo:                 ;Ciclo per la stampa
+     
+     Call DIVISIONE       
+      
+     MOV AH, 0            
+     MOV AL,divisore
+     MOV BL,num10
+     DIV BL
+     MOV divisore, AL  
+     
+     LOOP ciclo
+     
+     
+     mov ax, 4c00h
+    int 21h
+        
+divisione   PROC NEAR      
+    PUSH AX
+    PUSH BX
+    PUSH DX
+    
+    MOV AH, 0            
+    MOV BL, numero
+    MOV AL, divisore
+    DIV BL             
+     
+    MOV divisore,AH      ;sostituzione del numero con il resto della divisione
+    
+    ADD AL, 30H        ;trasformazione del numero in carattere
+    
+    MOV DL, AL        
+    MOV AH, 02h
+    INT 21h
+    
+    POP DX
+    POP BX
+    POP AX
+    RET    
+endp
+    
+
+
+ 
+
+
+ends
+
+end start
