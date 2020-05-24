@@ -1,0 +1,196 @@
+data segment
+str1    DB "Inserisci una lettera minuscola: $"
+str2    DB "Inserisci il carattere 5: $"
+str3    DB "Inserisci il carattere 9: $"
+str4    DB "I caratteri precedenti: $"
+str5    DB "I caratteri successivi: $"  
+car    DB ? 
+num5 DB ?
+num9 DB ?
+uguale DB 0F2h
+ends
+
+stack segment
+    dw   128  dup(0)
+ends
+
+code segment
+start:
+
+    ; add your code here
+
+
+    MOV AX, data  
+    MOV DS, AX 
+
+chiedi:
+    CALL Acapo  
+    LEA DX, str1   ;visualizza la stringa str1
+    MOV AH, 09h
+    INT 21h
+
+    MOV AH, 01h    ;richiede un carattere da tastiera 
+                   ;  che viene inserito in AL
+    INT 21h 
+
+   ;CONTROLLA SE LA LETTERA E' COMPRESA
+
+    CMP AL, 67h     ;confronta il carattere con g 
+    JL  chiedi
+    CMP AL, 6Dh    ;confronta il carattere con m  
+    JG  chiedi
+    
+    MOV car, AL
+    
+    
+    ;Richiesta della cifra 5
+chiedi5:
+    CALL ACapo 
+    LEA DX, str2  ;visualizza la frase in str2
+    MOV AH, 09h
+    INT 21h
+    
+    MOV AH, 01h   ;richiede l'input di un carattere 
+    INT 21h  
+    
+    CMP AL, 35h     ;confrontrolla se il carretere e 5
+    JL  chiedi5
+    CMP AL, 35h     
+    JG  chiedi5
+    
+     
+                  
+    SUB AL, 30h   ;trasformazione da carattere a cifra
+    MOV num5, AL  ;la cifra viene memorizzata 
+    
+    
+    
+    ;Richiesta della cifra 9
+chiedi9:
+    CALL ACapo     
+    LEA DX, str3  ;visualizza la frase in str3
+    MOV AH, 09h
+    INT 21h
+    
+    MOV AH, 01h   ;richiede l'input di un carattere
+    INT 21h  
+    
+    CMP AL, 39h     ;confrontrolla se il carretere e 9
+    JL  chiedi9
+    CMP AL, 39h     
+    JG  chiedi9
+    
+    MOV num9, AL ;il carattere e' inserito in num9 
+                  
+    SUB AL, 30h   ;trasformazione da carattere a cifra
+    MOV num9, AL  ;la cifra viene memorizzata 
+      
+    
+    ;----------------- 
+    CALL ACapo   
+    LEA DX, str4   ;visualizza la stringa str4
+    MOV AH, 09h
+    INT 21h
+    
+    MOV BL, car
+    SUB BL, 26h
+    
+    MOV CX, 0
+    MOV CL, num5
+    CALL ACapo 
+    CALL Uguali
+ciclo51:
+    
+    
+    INC BL
+    CALL ACapo
+    MOV DL,BL    
+    MOV AH, 02h
+    INT 21h
+    CALL ACapo 
+    CALL Uguali
+    
+    LOOP ciclo51  
+    
+    
+     ;----------------- 
+    CALL ACapo   
+    LEA DX, str5   ;visualizza la stringa str5
+    MOV AH, 09h
+    INT 21h
+    
+    MOV BL, car
+    SUB BL, 20h
+    
+    MOV CX, 0
+    MOV CL, num5 
+    CALL ACapo
+    CALL Uguali
+ciclo52:
+    
+    
+    INC BL
+    CALL ACapo
+    MOV DL,BL    
+    MOV AH, 02h
+    INT 21h
+    CALL ACapo 
+    CALL Uguali
+    
+    LOOP ciclo52      
+   
+   
+    
+    mov ax, 4c00h
+    int 21h  
+    
+    ;NOVE UGUALI
+Uguali  PROC NEAR 
+    PUSH DX
+    PUSH AX
+    
+    PUSH CX
+      
+    
+    MOV CX, 0
+    MOV CL, num9
+        
+    
+ciclo9: 
+
+    MOV DL,uguale
+    
+    MOV AH,02h
+    INT 21h
+    LOOP ciclo9
+    POP CX
+    POP AX
+    
+    POP DX
+         
+    RET
+endp        
+    
+    ;ANDARE A CAPO
+ACapo    PROC NEAR
+    PUSH AX
+    PUSH DX  
+    
+    
+    MOV DL, 0Ah     ;line feed
+    MOV AH, 02h
+    INT 21h
+    MOV DL, 0Dh     ;carriage return
+    MOV AH, 02h
+    INT 21h
+    POP DX
+    POP AX
+     
+    RET
+endp
+    
+  
+
+ends
+
+end start
